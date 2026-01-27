@@ -42,10 +42,11 @@ export default function Page() {
           'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", Arial',
       }}
     >
-      <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>
+      <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8, color: "#ffffff" }}>
+
         キックボクシング コンビネーション生成
       </h1>
-      <p style={{ marginTop: 0, color: "#444", lineHeight: 1.6 }}>
+      <p style={{ color: "#e5e5e5" }}>
         技数を指定すると、ランダムにコンビネーションを提案します（軽いルールで“それっぽさ”あり）。
       </p>
 
@@ -143,6 +144,7 @@ export default function Page() {
             minHeight: 64,
             display: "flex",
             alignItems: "center",
+            color: "#000",
           }}
         >
           {comboText ? (
@@ -153,7 +155,7 @@ export default function Page() {
         </div>
 
         {!!result.length && (
-          <ul style={{ marginTop: 10, color: "#333", lineHeight: 1.7 }}>
+          <ul style={{ marginTop: 10, color: "#fff", lineHeight: 1.7 }}>
             {result.map((m, i) => (
               <li key={`${m}-${i}`}>
                 {i + 1}. {m}
