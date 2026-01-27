@@ -144,11 +144,11 @@ export default function Page() {
             minHeight: 64,
             display: "flex",
             alignItems: "center",
-            color: "#000",
+            color: "#111",
           }}
         >
           {comboText ? (
-            <span style={{ fontSize: 18, fontWeight: 700 }}>{comboText}</span>
+            <span style={{ fontSize: 18, fontWeight: 700, color: "#111" }}>{comboText}</span>
           ) : (
             <span style={{ color: "#777" }}>「生成する」を押してください</span>
           )}
