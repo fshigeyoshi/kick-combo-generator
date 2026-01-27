@@ -5,7 +5,6 @@ import {
   generateCombo,
   type Stance,
   type Level,
-  DEFAULT_RULES,
 } from "../lib/combo";
 
 export default function Page() {
@@ -21,7 +20,6 @@ export default function Page() {
       count,
       stance,
       level,
-      rules: DEFAULT_RULES,
     });
     setResult(combo);
   }

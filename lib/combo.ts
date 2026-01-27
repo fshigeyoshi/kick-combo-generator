@@ -150,10 +150,7 @@ export function generateCombo(opts: {
       if (usedIds.has(m.id)) w *= 0.25;
 
       const isLast = i === catSeq.length - 1;
-      if (isLast) {
-        if (m.category === "kick") w *= opts.rules.finisherBias.kick;
-        if (m.category === "knee") w *= opts.rules.finisherBias.knee;
-      }
+ 
 
       if (prev && prev.label.includes("左") && m.label.includes("左")) w *= 0.75;
       if (prev && prev.label.includes("右") && m.label.includes("右")) w *= 0.75;
