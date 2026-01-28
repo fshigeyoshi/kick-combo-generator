@@ -1,7 +1,7 @@
 export type Stance = "orthodox" | "southpaw";
 export type Level = "beginner" | "intermediate" | "advanced";
 
-type Category = "punch" | "kick" | "knee";
+type Category = "punch" | "kick" | "knee"| "defense";
 
 export type Move = {
   id: string;
@@ -36,14 +36,16 @@ const MOVES: Move[] = [
   { id: "lupper", label: "左アッパー", category: "punch", level: "intermediate" },
   { id: "rupper", label: "右アッパー", category: "punch", level: "intermediate" },
   { id: "bodycross", label: "ボディストレート", category: "punch", level: "intermediate" },
-  { id: "lbody", label: "左ボディブロー", category: "punch", level: "intermediate" },
-  { id: "rbody", label: "右ボディブロー", category: "punch", level: "intermediate" },
+  { id: "lbody", label: "左ボディ", category: "punch", level: "intermediate" },
+  { id: "rbody", label: "右ボディ", category: "punch", level: "intermediate" },
 
-  // Low kick（狙い別）
-  { id: "l_in_low", label: "左インロー（前足内側）", category: "kick", level: "beginner" },
-  { id: "l_rear_low", label: "左奥脚ロー（後ろ足）", category: "kick", level: "beginner" },
-  { id: "r_in_low", label: "右インロー（前足内側）", category: "kick", level: "beginner" },
-  { id: "r_rear_low", label: "右奥脚ロー（後ろ足）", category: "kick", level: "beginner" },
+  // Low kick
+  { id: "l_low", label: "左ロー", category: "kick", level: "beginner" },
+  { id: "r_low", label: "右ロー", category: "kick", level: "beginner" },
+  { id: "l_in_low", label: "インロー", category: "kick", level: "intermediate" },
+  { id: "l_rear_low", label: "奥脚ロー", category: "kick", level: "intermediate" },
+  { id: "r_in_low", label: "インロー", category: "kick", level: "intermediate" },
+  { id: "r_rear_low", label: "奥脚ロー", category: "kick", level: "intermediate" },
 
   // Kick
   { id: "midl", label: "左ミドル", category: "kick", level: "beginner" },
@@ -58,7 +60,6 @@ const MOVES: Move[] = [
   { id: "kneer", label: "右ヒザ", category: "knee", level: "intermediate" },
 
   // Advanced
-  { id: "switchkick", label: "スイッチキック", category: "kick", level: "advanced" },
   { id: "spinningback", label: "スピニングバックキック", category: "kick", level: "advanced" },
 ];
 
