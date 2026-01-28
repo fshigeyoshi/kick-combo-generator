@@ -81,6 +81,13 @@ function pickWeighted<T>(items: T[], weights: number[]): T {
   }
   return items[items.length - 1];
 }
+function isLeftSideMove(m: Move): boolean {
+  // idが l で始まる技を「左」とみなす（lhook / l_low / midl / l_in_low など）
+  return m.id.startsWith("l");
+}
+function isRightSideMove(m: Move): boolean {
+  return m.id.startsWith("r");
+}
 
 function buildCategorySequence(count: number, level: Level): Category[] {
   const categories: Category[] = ["punch", "kick", "knee"];
@@ -182,6 +189,27 @@ if (opts.stance === "southpaw" && m.id === "r_low") return false;
 
   return true;
 });
+    // 初手だけ：70%で「前手（ジャブ含む） or 前脚のキック（インロー含む）」を優先
+    if (i === 0 && (cat === "punch" || cat === "kick") && Math.random() < 0.7) {
+      const preferFront = candidates.filter((m) => {
+        // punch or kick のみを対象（knee/defenseはこの優先に含めない）
+        if (!(m.category === "punch" || m.category === "kick")) return false;
+
+        // ジャブは常に前手扱い（優先グループに含める）
+        if (m.id === "jab") return true;
+
+        // オーソは左（前手/前脚）を優先
+        if (opts.stance === "orthodox") return isLeftSideMove(m);
+
+        // サウスポーは右（前手/前脚）を優先
+        return isRightSideMove(m);
+      });
+
+      // 候補がある時だけ差し替える（空になる事故防止）
+      if (preferFront.length > 0) {
+        candidates = preferFront;
+      }
+    }
 
     if (candidates.length === 0) candidates = pool;
 
