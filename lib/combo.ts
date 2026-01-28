@@ -175,6 +175,10 @@ export function generateCombo(opts: {
   // インローは前足側のみ許可
   if (opts.stance === "orthodox" && m.id === "r_in_low") return false;
   if (opts.stance === "southpaw" && m.id === "l_in_low") return false;
+  // ローはスタンスに合わせる（オーソは右ローのみ／サウスポーは左ローのみ）
+if (opts.stance === "orthodox" && m.id === "l_low") return false;
+if (opts.stance === "southpaw" && m.id === "r_low") return false;
+
 
   return true;
 });
