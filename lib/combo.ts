@@ -83,33 +83,73 @@ function pickWeighted<T>(items: T[], weights: number[]): T {
 }
 
 function buildCategorySequence(count: number, level: Level): Category[] {
-  const P: Category = "punch";
-  const K: Category = "kick";
-  const N: Category = "knee";
+  const categories: Category[] = ["punch", "kick", "knee"];
 
-  const templates: Record<number, Category[][]> = {
-    3: [[P, P, K]],
-    4: [[P, P, P, K], [P, P, K, K]],
-    5: [[P, P, P, P, K], [P, P, K, P, K]],
-    6: [[P, P, P, P, P, K], [P, P, P, K, P, K]],
-    7: [[P, P, P, P, P, P, K]],
-    8: [[P, P, P, P, P, P, P, K]],
+  const weights: Record<Level, Record<Category, number>> = {
+    beginner: { punch: 7, kick: 3, knee: 0, defense: 0 },
+    intermediate: { punch: 6, kick: 3, knee: 1, defense: 0 },
+    advanced: { punch: 5, kick: 3, knee: 2, defense: 0 },
   };
 
   const safe = clamp(count, 3, 8);
-  let cand = templates[safe] ?? templates[4];
+  const seq: Category[] = [];
 
-  if (level !== "beginner") {
-    cand = cand.map((t) => {
-      const copy = [...t];
-      if (safe >= 4) copy[safe - 2] = Math.random() < 0.5 ? K : N;
-      return copy;
-    });
+  // 1手目だけ「キック始動」を許可（確率）
+  const firstKickChance = level === "beginner" ? 0.2 : level === "intermediate" ? 0.3 : 0.35;
+  if (Math.random() < firstKickChance) {
+    seq.push("kick");
+  } else {
+    seq.push("punch");
   }
 
-  return cand[Math.floor(Math.random() * cand.length)];
-}
+  for (let i = 1; i < safe; i++) {
+    const prev = seq[i - 1];
 
+    // 終盤はフィニッシュ寄りに（中盤キックOKのまま、最後は蹴り/膝が増える）
+    const isLast = i === safe - 1;
+    const isNearLast = i === safe - 2;
+
+    let base = { ...weights[level] };
+
+    if (isLast) {
+      base = {
+        ...base,
+        punch: Math.max(1, base.punch - 2),
+        kick: base.kick + 2,
+        knee: base.knee + (level === "beginner" ? 0 : 1),
+      };
+    } else if (isNearLast) {
+      base = {
+        ...base,
+        punch: Math.max(1, base.punch - 1),
+        kick: base.kick + 1,
+      };
+    }
+
+    // 候補カテゴリ（連続kick/kneeは避ける：今のルール踏襲）
+    const pool = categories.filter((c) => {
+      if (prev === "kick" && c === "kick") return false;
+      if (prev === "knee" && c === "knee") return false;
+      return true;
+    });
+
+    // 重み付き抽選
+    const expanded: Category[] = [];
+    for (const c of pool) {
+      const w = base[c]; // defenseは0なので参照してもOK（poolに入ってない）
+      for (let k = 0; k < w; k++) expanded.push(c);
+    }
+
+    seq.push(expanded[Math.floor(Math.random() * expanded.length)]);
+  }
+
+  // punchゼロ防止（コンビ感）
+  if (!seq.includes("punch")) {
+    seq[Math.floor(Math.random() * seq.length)] = "punch";
+  }
+
+  return seq;
+}
 export function generateCombo(opts: {
   count: number;
   stance: Stance;
