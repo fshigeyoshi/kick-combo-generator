@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import React, { useMemo, useState } from "react";
 import {
   generateCombo,
@@ -135,24 +136,39 @@ export default function Page() {
           結果
         </h2>
 
-        <div
-          style={{
-            padding: 16,
-            border: "1px solid #ddd",
-            borderRadius: 14,
-            background: "#fafafa",
-            minHeight: 64,
-            display: "flex",
-            alignItems: "center",
-            color: "#111",
-          }}
-        >
-          {comboText ? (
-            <span style={{ fontSize: 18, fontWeight: 700, color: "#111" }}>{comboText}</span>
-          ) : (
-            <span style={{ color: "#777" }}>「生成する」を押してください</span>
-          )}
-        </div>
+<div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+  {/* 柴犬トレーナー */}
+  <div style={{ flex: "0 0 auto" }}>
+    <Image
+      src="/shiba-trainer.png"
+      alt="柴犬トレーナー"
+      width={160}
+      height={160}
+      priority
+      style={{
+        width: 140,
+        height: "auto",
+        borderRadius: 16,
+        background: "transparent",
+      }}
+    />
+  </div>
+
+  {/* 吹き出し */}
+  <div style={bubbleStyle}>
+    <div style={bubbleTailStyle} />
+
+    {comboText ? (
+      <div style={{ fontSize: 18, fontWeight: 800, color: "#111", lineHeight: 1.55 }}>
+        {comboText}
+      </div>
+    ) : (
+      <div style={{ color: "#333", fontWeight: 700, lineHeight: 1.55 }}>
+        生成ボタンを押してね
+      </div>
+    )}
+  </div>
+</div>
 
         {!!result.length && (
           <ul style={{ marginTop: 10, color: "#fff", lineHeight: 1.7 }}>
@@ -213,4 +229,28 @@ const secondaryButtonStyle: React.CSSProperties = {
   color: "#111",
   fontWeight: 800,
   cursor: "pointer",
+};
+
+const bubbleStyle: React.CSSProperties = {
+  position: "relative",
+  padding: "14px 16px",
+  border: "2px solid #111",
+  borderRadius: 18,
+  background: "#fff",
+  color: "#111",
+  minHeight: 90,
+  flex: 1,
+  boxShadow: "0 6px 0 #111",
+};
+
+const bubbleTailStyle: React.CSSProperties = {
+  position: "absolute",
+  left: -10,
+  top: 28,
+  width: 18,
+  height: 18,
+  background: "#fff",
+  borderLeft: "2px solid #111",
+  borderBottom: "2px solid #111",
+  transform: "rotate(45deg)",
 };
