@@ -27,10 +27,20 @@ export default function Page() {
     setResult(combo);
   }
 
-  async function onCopy() {
-    if (!comboText) return;
-    await navigator.clipboard.writeText(comboText);
-    alert("コピーしました！");
+  const shareText = useMemo(() => {
+    const combo = comboText ? comboText.replace(/\s→\s/g, "→") : "（まだ結果がありません）";
+    return [
+      "今日の柴犬トレーナー@shibainukick365からの指令🥊",
+      `「${combo}」`,
+      "難しいけど楽しいな🐶",
+      "#キックボクシングをする柴犬",
+      "https://kick-combo-generator.vercel.app",
+    ].join("\n");
+  }, [comboText]);
+
+  function onShareX() {
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
   }
 
   return (
@@ -111,14 +121,12 @@ export default function Page() {
         </div>
 
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <button
-            onClick={onGenerate}
-            style={primaryButtonStyle}
-          >
+          <button onClick={onGenerate} style={primaryButtonStyle}>
             生成する
           </button>
+
           <button
-            onClick={onCopy}
+            onClick={onShareX}
             disabled={!comboText}
             style={{
               ...secondaryButtonStyle,
@@ -126,7 +134,7 @@ export default function Page() {
               cursor: comboText ? "pointer" : "not-allowed",
             }}
           >
-            コピー
+            Xでシェア
           </button>
         </div>
       </section>
