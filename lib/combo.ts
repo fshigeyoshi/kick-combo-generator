@@ -8,6 +8,9 @@ export type Move = {
   label: string;
   category: Category;
   level: Level;
+
+  // 指定がある場合、そのスタンスでのみ出す
+  stance?: Stance;
 };
 
 export type Rules = {
@@ -58,6 +61,31 @@ const MOVES: Move[] = [
   // Knee
   { id: "kneel", label: "左ヒザ", category: "knee", level: "intermediate" },
   { id: "kneer", label: "右ヒザ", category: "knee", level: "intermediate" },
+  // Defense (intermediate+)
+  // パターン1：ディフェンス単体（次は何でもOK）
+  { id: "parry_jab", label: "ジャブをパリィ", category: "defense", level: "intermediate" },
+  { id: "parry_straight", label: "ストレートをパリィ", category: "defense", level: "intermediate" },
+  { id: "stepback_12", label: "ワンツーをステップバック", category: "defense", level: "intermediate" },
+
+  { id: "cut_midl_o", label: "左ミドルをカット", category: "defense", level: "intermediate", stance: "orthodox" },
+  { id: "cut_midr_s", label: "右ミドルをカット", category: "defense", level: "intermediate", stance: "southpaw" },
+
+  { id: "cut_low_o", label: "右ローをカット", category: "defense", level: "intermediate", stance: "orthodox" },
+  { id: "cut_low_s", label: "左ローをカット", category: "defense", level: "intermediate", stance: "southpaw" },
+
+  { id: "cut_inlow", label: "インローをカット", category: "defense", level: "intermediate" },
+
+  // パターン2：ディフェンス＋返し（1手で完結）
+  { id: "weave_lhook_straight_o", label: "左フックをウィービング➞ストレート", category: "defense", level: "intermediate", stance: "orthodox" },
+  { id: "weave_rhook_straight_s", label: "右フックをウィービング➞ストレート", category: "defense", level: "intermediate", stance: "southpaw" },
+
+  { id: "weave_rhook_lhook_straight_o", label: "右フックをウィービング➞左フック・ストレート", category: "defense", level: "intermediate", stance: "orthodox" },
+  { id: "weave_lhook_rhook_straight_s", label: "左フックをウィービング➞右フック・ストレート", category: "defense", level: "intermediate", stance: "southpaw" },
+
+  { id: "slip_straight_body_o", label: "ストレートをヘッドスリップ➞左ボディ", category: "defense", level: "intermediate", stance: "orthodox" },
+  { id: "slip_straight_body_s", label: "ストレートをヘッドスリップ➞右ボディ", category: "defense", level: "intermediate", stance: "southpaw" },
+
+  { id: "sway_straight_straight", label: "ストレートをスウェイ➞ストレート", category: "defense", level: "intermediate" },
 
   // Advanced
   { id: "spinningback", label: "スピニングバックキック", category: "kick", level: "advanced" },
@@ -90,13 +118,13 @@ function isRightSideMove(m: Move): boolean {
 }
 
 function buildCategorySequence(count: number, level: Level): Category[] {
-  const categories: Category[] = ["punch", "kick", "knee"];
+const categories: Category[] = ["punch", "kick", "knee", "defense"];
 
-  const weights: Record<Level, Record<Category, number>> = {
-    beginner: { punch: 7, kick: 3, knee: 0, defense: 0 },
-    intermediate: { punch: 6, kick: 3, knee: 1, defense: 0 },
-    advanced: { punch: 5, kick: 3, knee: 2, defense: 0 },
-  };
+const weights: Record<Level, Record<Category, number>> = {
+  beginner: { punch: 7, kick: 3, knee: 0, defense: 0 },
+  intermediate: { punch: 6, kick: 3, knee: 1, defense: 1 },
+  advanced: { punch: 5, kick: 3, knee: 2, defense: 2 },
+};
 
   const safe = clamp(count, 3, 8);
   const seq: Category[] = [];
@@ -134,11 +162,12 @@ function buildCategorySequence(count: number, level: Level): Category[] {
     }
 
     // 候補カテゴリ（連続kick/kneeは避ける：今のルール踏襲）
-    const pool = categories.filter((c) => {
-      if (prev === "kick" && c === "kick") return false;
-      if (prev === "knee" && c === "knee") return false;
-      return true;
-    });
+const pool = categories.filter((c) => {
+  if (prev === "kick" && c === "kick") return false;
+  if (prev === "knee" && c === "knee") return false;
+  if (prev === "defense" && c === "defense") return false;
+  return true;
+});
 
     // 重み付き抽選
     const expanded: Category[] = [];
@@ -183,9 +212,10 @@ export function generateCombo(opts: {
   if (opts.stance === "orthodox" && m.id === "r_in_low") return false;
   if (opts.stance === "southpaw" && m.id === "l_in_low") return false;
   // ローはスタンスに合わせる（オーソは右ローのみ／サウスポーは左ローのみ）
-if (opts.stance === "orthodox" && m.id === "l_low") return false;
-if (opts.stance === "southpaw" && m.id === "r_low") return false;
+  if (opts.stance === "orthodox" && m.id === "l_low") return false;
+  if (opts.stance === "southpaw" && m.id === "r_low") return false;
 
+  if (m.stance && m.stance !== opts.stance) return false;
 
   return true;
 });
