@@ -43,6 +43,10 @@ export default function Page() {
     window.open(url, "_blank", "noopener,noreferrer");
   }
 
+  function openLink(url: string) {
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+
   return (
     <main
       style={{
@@ -120,23 +124,42 @@ export default function Page() {
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <button onClick={onGenerate} style={primaryButtonStyle}>
-            生成する
-          </button>
+<div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+  <button onClick={onGenerate} style={primaryButtonStyle}>
+    生成する
+  </button>
 
-          <button
-            onClick={onShareX}
-            disabled={!comboText}
-            style={{
-              ...secondaryButtonStyle,
-              opacity: comboText ? 1 : 0.5,
-              cursor: comboText ? "pointer" : "not-allowed",
-            }}
-          >
-            Xでシェア
-          </button>
-        </div>
+  <button
+    onClick={onShareX}
+    disabled={!comboText}
+    style={{
+      ...secondaryButtonStyle,
+      opacity: comboText ? 1 : 0.5,
+      cursor: comboText ? "pointer" : "not-allowed",
+    }}
+  >
+    Xでシェア
+  </button>
+
+  <button
+    onClick={() =>
+      openLink(
+        "https://youtube.com/playlist?list=PLNWIG_e-8MgVwPShF5yxnX56Xd3rGSlkg&si=eG1iNsx1DYPqqXn_"
+      )
+    }
+    style={secondaryButtonStyle}
+  >
+    YouTubeを見る
+  </button>
+
+  <button
+    onClick={() => openLink("https://ayumu.shopselect.net/")}
+    style={secondaryButtonStyle}
+  >
+    Tシャツを見る
+  </button>
+</div>
+
       </section>
 
       <section style={{ marginTop: 18 }}>
