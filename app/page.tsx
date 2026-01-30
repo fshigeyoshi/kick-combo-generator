@@ -2,30 +2,27 @@
 
 import Image from "next/image";
 import React, { useMemo, useState } from "react";
-import {
-  generateCombo,
-  type Stance,
-  type Level,
-  DEFAULT_RULES,
-} from "../lib/combo";
+import { generateCombo, type Stance, type Level, DEFAULT_RULES } from "../lib/combo";
 
 export default function Page() {
   const [count, setCount] = useState(4);
+  const [showHint, setShowHint] = useState(true);
   const [stance, setStance] = useState<Stance>("orthodox");
   const [level, setLevel] = useState<Level>("beginner");
   const [result, setResult] = useState<string[]>([]);
 
   const comboText = useMemo(() => result.join(" → "), [result]);
 
-  function onGenerate() {
-    const combo = generateCombo({
-      count,
-      stance,
-      level,
-      rules: DEFAULT_RULES,
-    });
-    setResult(combo);
-  }
+function onGenerate() {
+  const combo = generateCombo({
+    count,
+    stance,
+    level,
+    rules: DEFAULT_RULES,
+  });
+  setResult(combo);
+  setShowHint(true); // ← 生成後に👆を復活
+}
 
   const shareText = useMemo(() => {
     const combo = comboText ? comboText.replace(/\s→\s/g, "→") : "（まだ結果がありません）";
@@ -48,170 +45,220 @@ export default function Page() {
   }
 
   return (
-    <main
-      style={{
-        maxWidth: 720,
-        margin: "0 auto",
-        padding: "24px 16px",
-        fontFamily:
-          'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", Arial',
-      }}
-    >
-      <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8, color: "#ffffff" }}>
-
-        キックボクシング コンビネーション生成
-      </h1>
-      <p style={{ color: "#e5e5e5" }}>
-        技数を指定すると、ランダムにコンビネーションを提案します（中級以上でディフェンスあり）。
-      </p>
-
-      <section
+    <>
+      <main
         style={{
-          display: "grid",
-          gap: 12,
-          padding: 16,
-          border: "1px solid #ddd",
-          borderRadius: 14,
-          background: "#fff",
+          maxWidth: 720,
+          margin: "0 auto",
+          padding: "24px 16px",
+          fontFamily:
+            'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", Arial',
         }}
       >
-        <label style={{ display: "grid", gap: 6 }}>
-          <span style={{ fontWeight: 700 }}>技数：{count}</span>
-          <input
-            type="range"
-            min={3}
-            max={8}
-            value={count}
-            onChange={(e) => setCount(Number(e.target.value))}
-          />
-          <small style={{ color: "#666" }}>3〜8の間で選択</small>
-        </label>
+        <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8, color: "#ffffff" }}>
+          キックボクシング コンビネーション生成
+        </h1>
 
-        <div style={{ display: "grid", gap: 8 }}>
-          <span style={{ fontWeight: 700 }}>スタンス</span>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <RadioButton
-              label="オーソドックス"
-              checked={stance === "orthodox"}
-              onClick={() => setStance("orthodox")}
-            />
-            <RadioButton
-              label="サウスポー"
-              checked={stance === "southpaw"}
-              onClick={() => setStance("southpaw")}
-            />
-          </div>
-        </div>
+        <p style={{ color: "#e5e5e5" }}>
+          技数を指定すると、ランダムにコンビネーションを提案します（中級以上でディフェンスあり）。
+        </p>
 
-        <div style={{ display: "grid", gap: 8 }}>
-          <span style={{ fontWeight: 700 }}>レベル</span>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <RadioButton
-              label="初級"
-              checked={level === "beginner"}
-              onClick={() => setLevel("beginner")}
-            />
-            <RadioButton
-              label="中級"
-              checked={level === "intermediate"}
-              onClick={() => setLevel("intermediate")}
-            />
-            <RadioButton
-              label="上級"
-              checked={level === "advanced"}
-              onClick={() => setLevel("advanced")}
-            />
-          </div>
-        </div>
+<section
+  style={{
+    display: "grid",
+    gap: 12,
+    padding: 16,
+    border: "1px solid #ddd",
+    borderRadius: 14,
+    background: "#fff",
 
-<div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-  <button onClick={onGenerate} style={primaryButtonStyle}>
-    生成する
-  </button>
+    // ★ここから追加（保険）
+    color: "#111",
+    WebkitTextFillColor: "#111",
+  }}
+>
+          <label style={{ display: "grid", gap: 6 }}>
+            <span style={{ fontWeight: 700 }}>技数：{count}</span>
 
-  <button
-    onClick={onShareX}
-    disabled={!comboText}
+          {/* 3〜8の数字（上に表示） */}
+<div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    fontSize: 12,
+    color: "#444",
+    fontWeight: 700,
+    marginBottom: 2,
+    padding: "0 2px",
+    userSelect: "none",
+  }}
+>
+  <span>3</span>
+  <span>4</span>
+  <span>5</span>
+  <span>6</span>
+  <span>7</span>
+  <span>8</span>
+</div>
+
+
+<div style={{ position: "relative", paddingTop: 6 }}>
+  <input
+    type="range"
+    min={3}
+    max={8}
+    value={count}
+    onChange={(e) => setCount(Number(e.target.value))}
+    onMouseDown={() => setShowHint(false)}
+    onTouchStart={() => setShowHint(false)}
+    style={{ width: "100%" }}
+  />
+
+{showHint && (
+  <div
     style={{
-      ...secondaryButtonStyle,
-      opacity: comboText ? 1 : 0.5,
-      cursor: comboText ? "pointer" : "not-allowed",
+      position: "relative",
+      height: 24,
+      marginTop: 2,
     }}
   >
-    Xでシェア
-  </button>
-
-  <button
-    onClick={() =>
-      openLink(
-        "https://youtube.com/playlist?list=PLNWIG_e-8MgVwPShF5yxnX56Xd3rGSlkg&si=eG1iNsx1DYPqqXn_"
-      )
-    }
-    style={secondaryButtonStyle}
-  >
-    YouTubeを見る
-  </button>
-
-  <button
-    onClick={() => openLink("https://ayumu.shopselect.net/")}
-    style={secondaryButtonStyle}
-  >
-    Tシャツを見る
-  </button>
-</div>
-
-      </section>
-
-      <section style={{ marginTop: 18 }}>
-        <h2 style={{ fontSize: 16, fontWeight: 800, marginBottom: 8 }}>
-          結果
-        </h2>
-
-<div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
-  {/* 柴犬トレーナー */}
-  <div style={{ flex: "0 0 auto" }}>
-    <Image
-      src="/shiba-trainer.png"
-      alt="柴犬トレーナー"
-      width={160}
-      height={160}
-      priority
+    <span
       style={{
-        width: 140,
-        height: "auto",
-        borderRadius: 16,
-        background: "transparent",
+        position: "absolute",
+        left: `${((count - 3) / 5) * 100}%`,
+        transform: "translateX(-50%)",
+        fontSize: 22,
+        animation: "fingerMove 1.2s ease-in-out infinite",
+        pointerEvents: "none",
       }}
-    />
+    >
+      👆
+    </span>
   </div>
-
-  {/* 吹き出し */}
-  <div style={bubbleStyle}>
-    <div style={bubbleTailStyle} />
-
-    {comboText ? (
-      <div style={{ fontSize: 18, fontWeight: 800, color: "#111", lineHeight: 1.55 }}>
-        {comboText}
-      </div>
-    ) : (
-      <div style={{ color: "#333", fontWeight: 700, lineHeight: 1.55 }}>
-        生成ボタンを押してね
-      </div>
-    )}
-  </div>
+)}
 </div>
+      </label>
 
-        {!!result.length && (
-          <ul style={{ marginTop: 10, color: "#fff", lineHeight: 1.7 }}>
-            {result.map((m, i) => (
-              <li key={`${m}-${i}`}>
-                {i + 1}. {m}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-    </main>
+
+          <div style={{ display: "grid", gap: 8 }}>
+            <span style={{ fontWeight: 700 }}>スタンス</span>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <RadioButton
+                label="オーソドックス"
+                checked={stance === "orthodox"}
+                onClick={() => setStance("orthodox")}
+              />
+              <RadioButton
+                label="サウスポー"
+                checked={stance === "southpaw"}
+                onClick={() => setStance("southpaw")}
+              />
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gap: 8 }}>
+            <span style={{ fontWeight: 700 }}>レベル</span>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <RadioButton label="初級" checked={level === "beginner"} onClick={() => setLevel("beginner")} />
+              <RadioButton
+                label="中級"
+                checked={level === "intermediate"}
+                onClick={() => setLevel("intermediate")}
+              />
+              <RadioButton label="上級" checked={level === "advanced"} onClick={() => setLevel("advanced")} />
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <button onClick={onGenerate} style={primaryButtonStyle}>
+              生成する
+            </button>
+
+            <button
+              onClick={onShareX}
+              disabled={!comboText}
+              style={{
+                ...secondaryButtonStyle,
+                opacity: comboText ? 1 : 0.5,
+                cursor: comboText ? "pointer" : "not-allowed",
+              }}
+            >
+              Xでシェア
+            </button>
+
+            <button
+              onClick={() =>
+                openLink(
+                  "https://youtube.com/playlist?list=PLNWIG_e-8MgVwPShF5yxnX56Xd3rGSlkg&si=eG1iNsx1DYPqqXn_"
+                )
+              }
+              style={secondaryButtonStyle}
+            >
+              YouTubeを見る
+            </button>
+
+            <button onClick={() => openLink("https://ayumu.shopselect.net/")} style={secondaryButtonStyle}>
+              Tシャツを見る
+            </button>
+          </div>
+        </section>
+
+        <section style={{ marginTop: 18 }}>
+          <h2 style={{ fontSize: 16, fontWeight: 800, marginBottom: 8, color: "#fff" }}>結果</h2>
+
+          <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+            <div style={{ flex: "0 0 auto" }}>
+              <Image
+                src="/shiba-trainer.png"
+                alt="柴犬トレーナー"
+                width={160}
+                height={160}
+                priority
+                style={{
+                  width: 140,
+                  height: "auto",
+                  borderRadius: 16,
+                  background: "transparent",
+                }}
+              />
+            </div>
+
+            <div style={bubbleStyle}>
+              <div style={bubbleTailStyle} />
+              {comboText ? (
+                <div style={{ fontSize: 18, fontWeight: 800, color: "#111", lineHeight: 1.55 }}>{comboText}</div>
+              ) : (
+                <div style={{ color: "#333", fontWeight: 700, lineHeight: 1.55 }}>生成ボタンを押してね</div>
+              )}
+            </div>
+          </div>
+
+          {!!result.length && (
+            <ul style={{ marginTop: 10, color: "#fff", lineHeight: 1.7 }}>
+              {result.map((m, i) => (
+                <li key={`${m}-${i}`}>
+                  {i + 1}. {m}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </main>
+
+<style jsx global>{`
+@keyframes fingerMove {
+  0% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateX(10px);
+  }
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+}
+`}</style>
+    </>
   );
 }
 
@@ -233,7 +280,8 @@ function RadioButton({
         borderRadius: 999,
         padding: "8px 12px",
         background: checked ? "#111" : "#fff",
-        color: checked ? "#fff" : "#111",
+        color: checked ? "#fff" : "#111",          // ←ここが超重要
+        WebkitTextFillColor: checked ? "#fff" : "#111", // ←iOS/一部ブラウザ保険
         fontWeight: 700,
       }}
     >
@@ -241,13 +289,13 @@ function RadioButton({
     </button>
   );
 }
-
 const primaryButtonStyle: React.CSSProperties = {
   border: "none",
   borderRadius: 12,
   padding: "10px 14px",
   background: "#111",
   color: "#fff",
+  WebkitTextFillColor: "#fff", // ←保険
   fontWeight: 800,
   cursor: "pointer",
 };
