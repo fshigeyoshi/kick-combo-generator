@@ -2,11 +2,13 @@
 
 import Image from "next/image";
 import React, { useMemo, useState } from "react";
-import { generateCombo, type Stance, type Level, DEFAULT_RULES } from "../lib/combo";
+import { generateCombo, type Stance, type Level, type Mode, DEFAULT_RULES } from "../lib/combo";
+
 
 export default function Page() {
   const [count, setCount] = useState(4);
   const [showHint, setShowHint] = useState(true);
+  const [mode, setMode] = useState<Mode>("kickboxing");
   const [stance, setStance] = useState<Stance>("orthodox");
   const [level, setLevel] = useState<Level>("beginner");
   const [result, setResult] = useState<string[]>([]);
@@ -18,6 +20,7 @@ function onGenerate() {
     count,
     stance,
     level,
+    mode, // ←追加（超重要）
     rules: DEFAULT_RULES,
   });
   setResult(combo);
@@ -139,6 +142,25 @@ function onGenerate() {
 </div>
       </label>
 
+<div style={{ display: "grid", gap: 8 }}>
+  <span style={{ fontWeight: 700 }}>モード</span>
+  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+    <RadioButton
+      label="キックボクシング"
+      checked={mode === "kickboxing"}
+      onClick={() => setMode("kickboxing")}
+    />
+    <RadioButton
+      label="ボクシング"
+      checked={mode === "boxing"}
+      onClick={() => setMode("boxing")}
+    />
+  </div>
+
+  <small style={{ color: "#666", lineHeight: 1.4 }}>
+    ボクシングモードはパンチのみ
+  </small>
+</div>
 
           <div style={{ display: "grid", gap: 8 }}>
             <span style={{ fontWeight: 700 }}>スタンス</span>
@@ -204,8 +226,7 @@ function onGenerate() {
         </section>
 
         <section style={{ marginTop: 18 }}>
-          <h2 style={{ fontSize: 16, fontWeight: 800, marginBottom: 8, color: "#fff" }}>結果</h2>
-
+           
           <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
             <div style={{ flex: "0 0 auto" }}>
               <Image
